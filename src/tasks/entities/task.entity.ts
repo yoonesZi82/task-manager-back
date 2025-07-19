@@ -1,20 +1,26 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import projectStatusEnum from '../enums/projectStatusEnum';
+import taskStatusEnum from '../enums/taskStatusEnum';
 
-@Entity({ name: 'projects' })
-export class Project {
+@Entity({ name: 'tasks' })
+export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
-  name: string;
+  @Column({ unique: true, type: 'varchar', length: 255 })
+  title: string;
+
+  @Column({ type: 'text' })
+  description: string;
 
   @Column({
     type: 'enum',
-    default: projectStatusEnum.ENABLED,
-    enum: projectStatusEnum,
+    default: taskStatusEnum.PENDING,
+    enum: taskStatusEnum,
   })
-  status: projectStatusEnum;
+  status: taskStatusEnum;
+
+  @Column({ type: 'bigint' })
+  projectId: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
