@@ -3,14 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   ParseIntPipe,
+  Query,
+  Put,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import projectStatusEnum from './enums/projectStatusEnum';
 
 @Controller('projects')
 export class ProjectsController {
@@ -22,16 +24,20 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  findAll(
+    @Query('status') status?: projectStatusEnum,
+    @Query('limit') limit: number = 8,
+    @Query('page') page: number = 1,
+  ) {
+    return this.projectsService.findAll(status || undefined, page, limit);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.projectsService.findOne(id);
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.projectsService.findById(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProjectDto: UpdateProjectDto,
