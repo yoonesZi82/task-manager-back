@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,16 +14,41 @@ import { Project } from './entities/project.entity';
 export class ProjectsService {
   constructor(
     @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
+    private readonly projectRepository: Repository<Project>,
   ) {}
 
   async create(createProjectDto: CreateProjectDto) {
-    const project = this.projectRepository.create(createProjectDto);
-    await this.projectRepository.save(project);
-    return {
-      message: 'Project created successfully',
-      project,
-    };
+    const { name } = createProjectDto;
+
+    const existingProject = await this.projectRepository.findOne({
+      where: { name },
+    });
+
+    if (existingProject) {
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: `Project name "${name}" already exists.`,
+          error: 'Conflict',
+        },
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    try {
+      const newProject = this.projectRepository.create(createProjectDto);
+      await this.projectRepository.save(newProject);
+      return {
+        message: 'Project created successfully',
+        newProject,
+      };
+    } catch (err: any) {
+      throw new BadRequestException({
+        statusCode: 500,
+        message: 'Error in creating project',
+        error: err.message,
+      });
+    }
   }
 
   findAll() {
