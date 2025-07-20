@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import taskStatusEnum from '../enums/taskStatusEnum';
+import { Project } from '@/projects/entities/project.entity';
 
 @Entity({ name: 'tasks' })
 export class Task {
@@ -19,8 +20,8 @@ export class Task {
   })
   status: taskStatusEnum;
 
-  @Column({ type: 'bigint' })
-  projectId: number;
+  @ManyToOne(() => Project, (project) => project.tasks)
+  project: Project;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
