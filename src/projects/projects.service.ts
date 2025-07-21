@@ -40,10 +40,7 @@ export class ProjectsService {
     try {
       const newProject = this.projectRepository.create(createProjectDto);
       await this.projectRepository.save(newProject);
-      return {
-        message: 'Project created successfully',
-        newProject,
-      };
+      return newProject;
     } catch (err: any) {
       throw new BadRequestException({
         statusCode: 500,
@@ -71,10 +68,7 @@ export class ProjectsService {
     try {
       const projects = await query.getMany();
 
-      return {
-        message: 'Projects fetched successfully',
-        projects,
-      };
+      return projects;
     } catch (err: any) {
       throw new BadRequestException({
         statusCode: 500,
@@ -92,10 +86,7 @@ export class ProjectsService {
         throw new NotFoundException('Project not found');
       }
 
-      return {
-        message: 'Project fetched successfully',
-        project,
-      };
+      return project;
     } catch (err: any) {
       if (err instanceof HttpException || err instanceof NotFoundException) {
         throw err;

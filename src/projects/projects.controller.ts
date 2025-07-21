@@ -8,45 +8,82 @@ import {
   ParseIntPipe,
   Query,
   Put,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import projectStatusEnum from './enums/projectStatusEnum';
+import { Response } from 'express';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  async create(
+    @Res() res: Response,
+    @Body() createProjectDto: CreateProjectDto,
+  ) {
+    const newProject = await this.projectsService.create(createProjectDto);
+    return res.status(HttpStatus.CREATED).json({
+      statusCode: HttpStatus.CREATED,
+      message: 'Project created successfully',
+      data: newProject,
+    });
   }
 
   @Get()
-  findAll(
+  async findAll(
+    @Res() res: Response,
     @Query('status') status?: projectStatusEnum,
     @Query('limit') limit: number = 8,
     @Query('page') page: number = 1,
   ) {
-    return this.projectsService.findAll(status || undefined, page, limit);
+    const projects = await this.projectsService.findAll(
+      status || undefined,
+      page,
+      limit,
+    );
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Projects fetched successfully',
+      data: projects,
+    });
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) {
-    return this.projectsService.findById(id);
+  async findById(@Res() res: Response, @Param('id', ParseIntPipe) id: number) {
+    const project = await this.projectsService.findById(id);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Project fetched successfully',
+      data: project,
+    });
   }
 
   @Put(':id')
-  update(
+  async update(
+    @Res() res: Response,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProjectDto: UpdateProjectDto,
   ) {
-    return this.projectsService.update(id, updateProjectDto);
+    await this.projectsService.update(id, updateProjectDto);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Project updated successfully',
+      data: null,
+    });
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.projectsService.remove(id);
+  async remove(@Res() res: Response, @Param('id', ParseIntPipe) id: number) {
+    await this.projectsService.remove(id);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      message: 'Project deleted successfully',
+      data: null,
+    });
   }
 }
