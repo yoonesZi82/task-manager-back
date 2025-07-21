@@ -7,7 +7,7 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true, type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   title: string;
 
   @Column({ type: 'text' })
@@ -15,7 +15,7 @@ export class Task {
 
   @Column({
     type: 'enum',
-    default: taskStatusEnum.PENDING,
+    default: taskStatusEnum.SETUP,
     enum: taskStatusEnum,
   })
   status: taskStatusEnum;

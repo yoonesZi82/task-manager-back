@@ -14,8 +14,8 @@ import {
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import projectStatusEnum from './enums/projectStatusEnum';
 import { Response } from 'express';
+import { ProjectQueryDto } from './dto/project-query.dto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -37,14 +37,12 @@ export class ProjectsController {
   @Get()
   async findAll(
     @Res() res: Response,
-    @Query('status') status?: projectStatusEnum,
-    @Query('limit') limit: number = 8,
-    @Query('page') page: number = 1,
+    @Query() projectQueryDto: ProjectQueryDto,
   ) {
     const projects = await this.projectsService.findAll(
-      status || undefined,
-      page,
-      limit,
+      projectQueryDto.status,
+      projectQueryDto.page,
+      projectQueryDto.limit,
     );
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,

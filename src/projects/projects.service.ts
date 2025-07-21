@@ -59,6 +59,20 @@ export class ProjectsService {
       .createQueryBuilder('project')
       .orderBy('project.createdAt', 'DESC');
 
+    if (
+      status &&
+      status !== projectStatusEnum.DISABLED &&
+      status !== projectStatusEnum.ENABLED
+    ) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Status must be one of the following: disabled, enabled',
+          error: 'Bad Request',
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     if (status) {
       query.where('project.status = :status', { status }); // :status is a dynamic parameter
     }
